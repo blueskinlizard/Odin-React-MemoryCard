@@ -12,7 +12,6 @@ export default function CardComposition(props){
         console.log("Running");
         async function fetchPokemonData() {
             try{
-                console.log("Fetching hopefully");
                 const promises = Array.from({length: props.cardAmount}, (_, i) => {
                     return fetch(`https://pokeapi.co/api/v2/pokemon/${i + 1}/`).then(res => res.json());
                 })
@@ -20,7 +19,7 @@ export default function CardComposition(props){
                 const results = await Promise.all(promises);
                 pokemonSetData(results);
                 setPokemonComponentData(results.map((pokemon) => {
-                    return <Card key={pokemon.name} imgSource={pokemon.sprites.front_default} onGameOver={handleGameOver} incrementScore = {incrementScore}/>
+                    return <Card key={pokemon.name} imgSource={pokemon.sprites.front_default} onGameOver={handleGameOver} incrementScore = {incrementScore} className="pokemonCard"/>
                 }))
             }
             catch(error){
@@ -40,17 +39,21 @@ export default function CardComposition(props){
     }
     const incrementScore = () =>{
         setScore((prevScore) => prevScore + 1)
-        shuffleArray(pokemonComponentData);
+        shuffleArray();
     }
-    const shuffleArray = (arrayParam) =>{
-        arrayParam.sort(() => Math.random() - 0.5);
-    }
+    const shuffleArray = () => {
+        const shuffledArray = [...pokemonComponentData].sort(() => Math.random() - 0.5);
+        console.log("Shuffled");
+        return(
+            <>
+            {shuffledArray}
+            </>
+        )
+      };
     return(
         <div className="card-composition">
             {displayScore()}
-            {gameOver? <h1>Game Over!</h1> : pokemonComponentData}
-                
-            
+            {gameOver? <h1>Game Over!</h1> : shuffleArray()}
         </div>
     )   
 }
