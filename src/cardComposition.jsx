@@ -5,6 +5,8 @@ import Card from "./card";
 export default function CardComposition(props){
     const [pokemonData, pokemonSetData] = useState([]);
     const [pokemonComponentData, setPokemonComponentData] = useState([]);
+    const [gameOver, setGameOver] = useState(false);
+    const [score, setScore] = useState(0);
     //fetches our API based off designated prop amount
     useEffect(() =>{
         console.log("Running");
@@ -16,10 +18,9 @@ export default function CardComposition(props){
                 })
                 
                 const results = await Promise.all(promises);
-                console.log("Fetched pokemon data", results);
                 pokemonSetData(results);
                 setPokemonComponentData(results.map((pokemon) => {
-                    return <Card key={pokemon.name} imgSource={pokemon.sprites.front_default} />
+                    return <Card key={pokemon.name} imgSource={pokemon.sprites.front_default} onGameOver={handleGameOver} incrementScore = {incrementScore}/>
                 }))
             }
             catch(error){
@@ -29,9 +30,27 @@ export default function CardComposition(props){
         }
         fetchPokemonData();
     }, [])
+
+    const handleGameOver = () =>{
+        setGameOver(true);
+        console.log("State changed to gameOver = true")
+    }
+    const displayScore = () =>{
+        return <h1 id="ScoreDisplay">Score: {score}</h1>;
+    }
+    const incrementScore = () =>{
+        setScore((prevScore) => prevScore + 1)
+        shuffleArray(pokemonComponentData);
+    }
+    const shuffleArray = (arrayParam) =>{
+        arrayParam.sort(() => Math.random() - 0.5);
+    }
     return(
         <div className="card-composition">
-            {[pokemonComponentData]}
+            {displayScore()}
+            {gameOver? <h1>Game Over!</h1> : pokemonComponentData}
+                
+            
         </div>
     )   
 }
